@@ -1,140 +1,123 @@
 #!/bin/bash
-#/Coded/by/entity015
 clear
 
-set -ou pipefail
-outpipe='unbuffer -p awk -F$ '\''/ETA/ {printf "\r"$1"\n"}'\'' && echo'
-outfile="-o %(title)s.%(ext)s"
-dl="unbuffer yt-dlp -i"
+if ! yt-dlp --version &>/dev/null;then
+	echo "Install yt-dlp first."
+	exit 1
+fi
 
-#colors
-RED="\033[1;31m"
-SEA="\033[1;36m"
-ICE="\033[1;37m"
-END="\033[0;00m"
+version="v1.1.0"
+set -o pipefail
 
-function banner {
-	echo -en $SEA
-	echo -n """
- __ __   ___     ___   ____     ___  
- || ||  // \\\   // \\\  || \\\   // \\\ 
- \\\ // ((   )) ((   )) ||  )) ((   ))
-  \V/   \\\_//   \\\_//  ||_//   \\\_// 
-                                     
-"""
-	echo -e "$ICE       \"VIDEO AUDIO DOWNLOAD\""
-	echo -e "$RED       ======================"
-	echo -e "$ICE            {${SEA}entity015♥${ICE}}     $END"
-	echo -e """
- ${SEA}1$END} Single URL
- ${SEA}2$END} Multiple URL [list]
- ${SEA}3$END} Playlist URL
- ${SEA}q$END} Quit
-"""
+out="--restrict-filenames -o %(title)s.%(ext)s"
+dlp="yt-dlp -i"
+red="\033[1;31m"
+sea="\033[1;36m"
+ice="\033[1;37m"
+end="\033[0;00m"
+
+banner() {
+	echo -en $sea
+	echo -n '
+ __ __   ___     ___   ____     ___
+ || ||  // \\   // \\  || \\   // \\
+ \\ // ((   )) ((   )) ||  )) ((   ))
+  \V/   \\_//   \\_//  ||_//   \\_//
+
+'
+	echo -e "$ice       \"VIDEO AUDIO DOWNLOAD\""
+	echo -e "$red      -======================-"
+	echo -e "$ice            {${sea}entity015♥${ice}}     "
+	echo -e "
+"
 }
 
-function choices {
-	echo -e """
- ${SEA}1$END} Video [MP4]
- ${SEA}2$END} Audio [Original Codec]
- ${SEA}3$END} Audio [MP3]
- ${SEA}4$END} Subtitle Only [If Availabe]
-"""
-}
+read -d '' help 0<<++
+
+Usage:
+  $0 <options>
+  $0 -f mp4 -s 1080 -u <url> -r 1-2,5
+  $0 -f mp3 -i favs.txt
+
+Options:
+  -u	Input URL
+  -i	Input file
+  -f	Format mp3,mp4,subtitle (default:mkv)
+  -s	Video resolution 480,720 (default:highest)
+  -r	Playlist range 1,2-6
+  -h	Print this help
+  -v	Print version
+
+$version
+++
 
 banner
 
-echo -en "[SELECT]~# "
-read choice
-
-if [[ $choice == "q" ]];then
-	exit 0
-
-elif [[ $choice == "1" ]];then
-	echo -en "[URL]~# "
-	read url
-
-	choices
-
-	echo -en "[SELECT]~# "
-	read choice
-	if [[ $choice == "1" ]];then
-		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
-		read res
-		if [[ $res == "" ]];then
-			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile $url | eval $outpipe
-		else
-			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile $url | eval $outpipe
-		fi
-	elif [[ $choice == "2" ]];then
-		$dl -f "ba" -x $outfile $url | eval $outpipe
-	elif [[ $choice == "3" ]];then
-		$dl -f "ba" -x --audio-format mp3 $outfile $url | eval $outpipe
-	elif [[ $choice == "4" ]];then
-		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
-		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
-		$dl --write-subs $langs --skip-download $outfile $url | eval $outpipe
-	fi
-
-elif [[ $choice == "2" ]];then
-	echo -en "[FILE]~# "
-	read file
-
-	choices
-
-	echo -en "[SELECT]~# "
-	read choice
-	if [[ $choice == "1" ]];then
-		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
-		read res
-		if [[ $res == "" ]];then
-			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile -a $file | eval $outpipe
-		else
-			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile -a $file | eval $outpipe
-		fi
-	elif [[ $choice == "2" ]];then
-		$dl -f "ba" -x $outfile -a $file | eval $outpipe
-	elif [[ $choice == "3" ]];then
-		$dl -f "ba" -x --audio-format mp3 $outfile -a $file | eval $outpipe
-	elif [[ $choice == "4" ]];then
-		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
-		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
-		$dl --write-subs $langs --skip-download $outfile -a $file | eval $outpipe
-	fi
-
-elif [[ $choice == "3" ]];then
-	echo -en "[URL]~# "
-	read url
-	echo -en "${SEA}Example: '1-5,10,15' or ENTER for all$END\n[INDEX]~# "
-	read index
-	if [[ $index == "" ]];then
-		items=""
-	else
-		items="--playlist-items $index"
-	fi
-
-	choices
-
-	echo -en "[SELECT]~# "
-	read choice
-	if [[ $choice == "1" ]];then
-		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
-		read res
-		if [[ $res == "" ]];then
-			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile --yes-playlist $items $url | eval $outpipe
-		else
-			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile --yes-playlist $items $url | eval $outpipe
-		fi
-	elif [[ $choice == "2" ]];then
-		$dl -f "ba" -x $outfile --yes-playlist $items $url | eval $outpipe
-	elif [[ $choice == "3" ]];then
-		$dl -f "ba" -x --audio-format mp3 $outfile --yes-playlist $items $url | eval $outpipe
-	elif [[ $choice == "4" ]];then
-		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
-		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
-		$dl --write-subs $langs --skip-download $outfile --yes-playlist $items $url | eval $outpipe
-	fi
-
-else
-	echo "Invalid option."
+if [[ ! $1 ]];then
+	echo "$help"
+	exit 1
 fi
+
+fmt="mkv"
+res="8192"
+lan="en"
+while [[ -n "$1" ]];do
+	if [[ $1 =~ ^- && ! $1 == "--" ]];then
+		case $1 in
+		-h | --help )
+			echo "$help"
+			exit 0
+			;;
+		-v | --version )
+			echo "$version"
+			exit 0
+			;;
+		-u | --url )
+			shift
+			url=$1
+			;;
+		-f | --format )
+			shift
+			fmt=$1
+			;;
+		-s | --size )
+			shift
+			res=$1
+			;;
+		-r | --range )
+			shift
+			ran="${1/*/--yes-playlist --playlist-items $1}"
+			;;
+		-l | --language )
+			shift
+			lan=$1
+			;;
+		-i | --input-file )
+			shift
+			file="${1/*/-a $1}"
+			;;
+		esac
+	fi
+	shift
+done
+
+if [[ ! $file && ! $url ]];then
+	echo "No URL/File specified."
+	exit 1
+fi
+
+declare -A formats
+
+formats[mkv]="-f bv*[height<=$res]+ba/b[height<=$res] --merge-output-format mkv"
+formats[mp4]="-f bv*[ext=mp4][height<=$res]+ba[ext=m4a]/b[ext=mp4][height<=$res] --merge-output-format mp4"
+formats[mp3]="-f ba -x --audio-format mp3"
+formats[subtitle]="--write-subs --sub-langs $lan --skip-download"
+
+format="${formats[$fmt]}"
+
+if [[ $fmt == "subtitle" || $fmt == "mp3" ]];then
+	$dlp $format $out $ran $url $file
+	exit 0
+fi
+
+$dlp $format --embed-subs $out $ran $url $file
