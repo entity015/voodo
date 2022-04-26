@@ -38,7 +38,7 @@ function choices {
  ${SEA}1$END} Video [MP4]
  ${SEA}2$END} Audio [Original Codec]
  ${SEA}3$END} Audio [MP3]
- ${SEA}4$END} Subtitle Only [If Availabe]
+ ${SEA}4$END} Subtitle Only [If Available]
 """
 }
 
