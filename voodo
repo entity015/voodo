@@ -1,0 +1,140 @@
+#!/bin/bash
+#/Coded/by/entity015
+clear
+
+set -ou pipefail
+outpipe='unbuffer -p awk -F$ '\''/ETA/ {printf "\r"$1"\n"}'\'' && echo'
+outfile="-o %(title)s.%(ext)s"
+dl="unbuffer yt-dlp -i"
+
+#colors
+RED="\033[1;31m"
+SEA="\033[1;36m"
+ICE="\033[1;37m"
+END="\033[0;00m"
+
+function banner {
+	echo -en $SEA
+	echo -n """
+ __ __   ___     ___   ____     ___  
+ || ||  // \\\   // \\\  || \\\   // \\\ 
+ \\\ // ((   )) ((   )) ||  )) ((   ))
+  \V/   \\\_//   \\\_//  ||_//   \\\_// 
+                                     
+"""
+	echo -e "$ICE       \"VIDEO AUDIO DOWNLOAD\""
+	echo -e "$RED       ======================"
+	echo -e "$ICE            {${SEA}entity015♥${ICE}}     $END"
+	echo -e """
+ ${SEA}1$END} Single URL
+ ${SEA}2$END} Multiple URL [list]
+ ${SEA}3$END} Playlist URL
+ ${SEA}q$END} Quit
+"""
+}
+
+function choices {
+	echo -e """
+ ${SEA}1$END} Video [MP4]
+ ${SEA}2$END} Audio [Original Codec]
+ ${SEA}3$END} Audio [MP3]
+ ${SEA}4$END} Subtitle Only [If Availabe]
+"""
+}
+
+banner
+
+echo -en "[SELECT]~# "
+read choice
+
+if [[ $choice == "q" ]];then
+	exit 0
+
+elif [[ $choice == "1" ]];then
+	echo -en "[URL]~# "
+	read url
+
+	choices
+
+	echo -en "[SELECT]~# "
+	read choice
+	if [[ $choice == "1" ]];then
+		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
+		read res
+		if [[ $res == "" ]];then
+			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile $url | eval $outpipe
+		else
+			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile $url | eval $outpipe
+		fi
+	elif [[ $choice == "2" ]];then
+		$dl -f "ba" -x $outfile $url | eval $outpipe
+	elif [[ $choice == "3" ]];then
+		$dl -f "ba" -x --audio-format mp3 $outfile $url | eval $outpipe
+	elif [[ $choice == "4" ]];then
+		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
+		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
+		$dl --write-subs $langs --skip-download $outfile $url | eval $outpipe
+	fi
+
+elif [[ $choice == "2" ]];then
+	echo -en "[FILE]~# "
+	read file
+
+	choices
+
+	echo -en "[SELECT]~# "
+	read choice
+	if [[ $choice == "1" ]];then
+		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
+		read res
+		if [[ $res == "" ]];then
+			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile -a $file | eval $outpipe
+		else
+			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile -a $file | eval $outpipe
+		fi
+	elif [[ $choice == "2" ]];then
+		$dl -f "ba" -x $outfile -a $file | eval $outpipe
+	elif [[ $choice == "3" ]];then
+		$dl -f "ba" -x --audio-format mp3 $outfile -a $file | eval $outpipe
+	elif [[ $choice == "4" ]];then
+		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
+		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
+		$dl --write-subs $langs --skip-download $outfile -a $file | eval $outpipe
+	fi
+
+elif [[ $choice == "3" ]];then
+	echo -en "[URL]~# "
+	read url
+	echo -en "${SEA}Example: '1-5,10,15' or ENTER for all$END\n[INDEX]~# "
+	read index
+	if [[ $index == "" ]];then
+		items=""
+	else
+		items="--playlist-items $index"
+	fi
+
+	choices
+
+	echo -en "[SELECT]~# "
+	read choice
+	if [[ $choice == "1" ]];then
+		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
+		read res
+		if [[ $res == "" ]];then
+			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile --yes-playlist $items $url | eval $outpipe
+		else
+			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile --yes-playlist $items $url | eval $outpipe
+		fi
+	elif [[ $choice == "2" ]];then
+		$dl -f "ba" -x $outfile --yes-playlist $items $url | eval $outpipe
+	elif [[ $choice == "3" ]];then
+		$dl -f "ba" -x --audio-format mp3 $outfile --yes-playlist $items $url | eval $outpipe
+	elif [[ $choice == "4" ]];then
+		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
+		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
+		$dl --write-subs $langs --skip-download $outfile --yes-playlist $items $url | eval $outpipe
+	fi
+
+else
+	echo "Invalid option."
+fi
