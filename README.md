@@ -9,11 +9,6 @@ See [***supported 1500+ sites***](https://github.com/yt-dlp/yt-dlp/blob/master/s
 - Custom resolution `default: highest`
 - Embed subtitle if available `default: en`
 
-### Screenshot
-*\*example using scloud playlist*
-
-![Screenshot1](screenshots/screenshot1.png)
-
 ### Installation
 ```bash
 apt install python3 expect
@@ -25,5 +20,10 @@ cd voodo
 chmod +x voodo
 ./voodo
 ```
+
+### Screenshot
+*\*example using scloud playlist*
+
+![Screenshot1](screenshots/screenshot1.png)
 
 -----
