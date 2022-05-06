@@ -3,9 +3,9 @@
 clear
 
 set -ou pipefail
-outpipe='unbuffer -p awk -F$ '\''/ETA/ {printf "\r"$1"\n"}'\'' && echo'
+#outpipe='unbuffer -p awk -F$ '\''/ETA/ {printf "\r"$1"\n"}'\'' && echo'
 outfile="-o %(title)s.%(ext)s"
-dl="unbuffer yt-dlp -i"
+dl="yt-dlp -i"
 
 #colors
 RED="\033[1;31m"
@@ -62,18 +62,18 @@ elif [[ $choice == "1" ]];then
 		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
 		read res
 		if [[ $res == "" ]];then
-			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile $url | eval $outpipe
+			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile $url
 		else
-			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile $url | eval $outpipe
+			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile $url
 		fi
 	elif [[ $choice == "2" ]];then
-		$dl -f "ba" -x $outfile $url | eval $outpipe
+		$dl -f "ba" -x $outfile $url
 	elif [[ $choice == "3" ]];then
-		$dl -f "ba" -x --audio-format mp3 $outfile $url | eval $outpipe
+		$dl -f "ba" -x --audio-format mp3 $outfile $url
 	elif [[ $choice == "4" ]];then
 		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
 		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
-		$dl --write-subs $langs --skip-download $outfile $url | eval $outpipe
+		$dl --write-subs $langs --skip-download $outfile $url
 	fi
 
 elif [[ $choice == "2" ]];then
@@ -88,18 +88,18 @@ elif [[ $choice == "2" ]];then
 		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
 		read res
 		if [[ $res == "" ]];then
-			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile -a $file | eval $outpipe
+			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile -a $file
 		else
-			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile -a $file | eval $outpipe
+			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile -a $file
 		fi
 	elif [[ $choice == "2" ]];then
-		$dl -f "ba" -x $outfile -a $file | eval $outpipe
+		$dl -f "ba" -x $outfile -a $file
 	elif [[ $choice == "3" ]];then
-		$dl -f "ba" -x --audio-format mp3 $outfile -a $file | eval $outpipe
+		$dl -f "ba" -x --audio-format mp3 $outfile -a $file
 	elif [[ $choice == "4" ]];then
 		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
 		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
-		$dl --write-subs $langs --skip-download $outfile -a $file | eval $outpipe
+		$dl --write-subs $langs --skip-download $outfile -a $file
 	fi
 
 elif [[ $choice == "3" ]];then
@@ -121,18 +121,18 @@ elif [[ $choice == "3" ]];then
 		echo -en "${SEA}Example: '720' or ENTER for best$END\n[RESOLUTION]~# "
 		read res
 		if [[ $res == "" ]];then
-			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile --yes-playlist $items $url | eval $outpipe
+			$dl -f "bv*+ba/b" --merge-output-format mp4 --embed-subs $outfile --yes-playlist $items $url
 		else
-			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile --yes-playlist $items $url | eval $outpipe
+			$dl -f "bv*[height<=$res]+ba/b[height<=$res]" --merge-output-format mp4 --embed-subs $outfile --yes-playlist $items $url
 		fi
 	elif [[ $choice == "2" ]];then
-		$dl -f "ba" -x $outfile --yes-playlist $items $url | eval $outpipe
+		$dl -f "ba" -x $outfile --yes-playlist $items $url
 	elif [[ $choice == "3" ]];then
-		$dl -f "ba" -x --audio-format mp3 $outfile --yes-playlist $items $url | eval $outpipe
+		$dl -f "ba" -x --audio-format mp3 $outfile --yes-playlist $items $url
 	elif [[ $choice == "4" ]];then
 		langs="";echo -en "${SEA}Example: 'en' (default)$END\n[LANG-CODE]~# "
 		read lang;if [[ $lang ]];then langs="--sub-langs $lang";fi
-		$dl --write-subs $langs --skip-download $outfile --yes-playlist $items $url | eval $outpipe
+		$dl --write-subs $langs --skip-download $outfile --yes-playlist $items $url
 	fi
 
 else
